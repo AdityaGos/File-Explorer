@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../App.css";
 export const Folder = (props) => {
-  const { explorer } = props;
+  const { explorer, insertTreeNode,deleteTreeNode } = props;
   const [expand, setExpand] = useState(false);
   const [showInput, setShowInput] = useState({
     visible: false,
@@ -18,8 +18,14 @@ export const Folder = (props) => {
   };
   const addFolder = (e) => {
     if (e.keyCode === 13 && e.target.value) {
+      // insert
+      insertTreeNode(explorer.id, e.target.value, showInput.isFolder);
       setShowInput({ ...showInput, visible: false });
     }
+  };
+  const handleDeleteFile = (folderId) => {
+    console.log("deleting file " + folderId)
+    deleteTreeNode(folderId);
   };
 
   if (explorer.isFolder) {
@@ -33,6 +39,7 @@ export const Folder = (props) => {
           <div>
             <button onClick={(e) => handleNewFolder(e, true)}>📂+</button>
             <button onClick={(e) => handleNewFolder(e, false)}>📄 +</button>
+            <button onClick={(e) => handleDeleteFile(explorer.id)}>❌</button>
           </div>
         </div>
         <div style={{ display: expand ? "block" : "none", paddingLeft: 20 }}>
@@ -48,16 +55,22 @@ export const Folder = (props) => {
               />
             </div>
           )}
-          {explorer.items.map((exp) => (
-            <Folder
-              explorer={exp}
-              key={exp.id}
-            />
-          ))}
+          {explorer.items &&
+            explorer.items.map((exp) => (
+              <Folder
+                explorer={exp}
+                key={exp.id}
+                insertTreeNode={insertTreeNode}
+                deleteTreeNode={deleteTreeNode}
+              />
+            ))}
         </div>
       </div>
     );
   } else {
-    return <span className="file"> 📄{explorer.name}</span>;
+    return <div className="file__container">
+    <span className="file"> 📄{explorer.name}</span>
+    <button onClick={(e) => handleDeleteFile(explorer.id)}>❌</button>
+    </div>
   }
 };
